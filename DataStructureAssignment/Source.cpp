@@ -88,7 +88,6 @@ public:
 		}
 	}
 
-
 	T getValue(int column) {
 		NodeType<T>* current = head;
 		while (current != NULL) {
@@ -218,7 +217,7 @@ SM<T>::SM(SM<T> & other)
 template<class T>
 SM<T>::~SM()
 {
-	cout << "Deleting everything" << endl;
+	cout << "Deleting sm" << endl;
 	delete[] rowList;
 }
 
@@ -258,7 +257,6 @@ void SM<T>::printMatrix()
 	{
 		rowList[i].printNodes(columns);
 	}
-
 	cout << endl;
 }
 
@@ -280,7 +278,7 @@ void SM<T>::addSM(SM<T> & other)
 
 int main()
 {
-	cout << "Input sparse matrix dimensions in following format: rowIndex columnIndex " << endl;
+	cout << "Enter sparse matrix dimension in following format: rowIndex columnIndex " << endl;
 	int rows, columns;
 	cin >> rows;
 	cin >> columns;
