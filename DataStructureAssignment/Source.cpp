@@ -25,8 +25,43 @@ public:
 		this->tail = NULL;
 	}
 
+	//copy constructor
+	LinkedList(const LinkedList & other) {
+		this->size = 0;
+		this->head = NULL;
+		this->tail = NULL;
+		NodeType<T> * current = other.head;
+		while (current != NULL) {
+			this->setValue(current->info, current->index);
+			current = current->link;
+		}
+	}
+
+	//LinkedList &operator =(const LinkedList & other) {
+	//	NodeType<T> * current = other.head;
+	//	while (current != NULL) {
+	//		this->setValue(current->info, current->index);
+	//		current = current->link;
+	//	}
+	//	return *this;
+	//}
+
+	//assignment operator
+	LinkedList& operator=(const LinkedList& other)
+	{
+		if (this == &other) {
+			return *this;
+		}
+
+		LinkedList temp(other); // uses copy constructor
+		swap(temp.size, size);
+		swap(temp.head, head);
+		swap(temp.tail, tail);
+		return *this;
+	}
+
 	~LinkedList() {
-		cout << "Going to delete all " << size << " elements of the list." << endl;
+//		cout << "Going to delete all " << size << " elements of the list." << endl;
 		NodeType<T> * current = head;
 		while (current != NULL) {
 			current = current->link;
@@ -146,33 +181,27 @@ public:
 	}
 
 	void sumNodes(LinkedList<T> &list2) {
-		if (this->size >= list2.size) {
-			NodeType<T> * current = head;
-			while (current != NULL) {
-				NodeType<T> * other = list2.head;
-				while (other != NULL) {
-					if (current->index == other->index) {
-						current->info += other->info;
-					}
-					other = other->link;
-				}
-				current = current->link;
-			}
-		}
-		else {
-			NodeType<T> * other = list2.head;
+		NodeType<T> * current = head;
+		NodeType<T> * other;
+		while (current != NULL) {
+			other = list2.head;
 			while (other != NULL) {
-				NodeType<T> * current = head;
-				while (current != NULL) {
-					if (other->index == current->index) {
-						current->info += other->info;
-						break;
-					}
-					current = current->link;
+				if (current->index == other->index) {
+					current->info += other->info;
+					other->info = NULL;
 				}
-				//setValue(other->info, other->index);
 				other = other->link;
 			}
+			current = current->link;
+		}
+
+		other = list2.head;
+		while (other != NULL)
+		{
+			if (other->info != NULL){
+				this->setValue(other->info, other->index);
+			}
+			other = other->link;
 		}
 	}
 };
@@ -182,15 +211,16 @@ class SM {
 private:
 	int rows;
 	int columns;
-	LinkedList<int> * rowList;
+	LinkedList<T> * rowList;
 
 public:
-	SM(int rows, int columns);
-	SM(SM & other);
+	SM<T>(int rows, int columns);
+	SM<T>(const SM<T> & other);
+	SM<T> &operator=(const SM<T> & other);
 	~SM();
 	void readElements();
 	void printMatrix();
-	void addSM(SM & other);
+	void addSM(SM<T> & other);
 };
 
 template<class T>
@@ -198,27 +228,41 @@ SM<T>::SM(int rows, int columns)
 {
 	this->rows = rows;
 	this->columns = columns;
-	this->rowList = new LinkedList<int>[rows];
+	this->rowList = new LinkedList<T>[rows];
 	cout << "Going to create a sparse matrix of dimensions " << this->rows << "-" << this->columns << endl;
 }
 
 template<class T>
-SM<T>::SM(SM<T> & other)
+SM<T>::SM(const SM<T> & other)
 {
 	this->rows = other.rows;
 	this->columns = other.columns;
-	this->rowList = new LinkedList<T>[rows];
-	for (int i = 0; i < rows; i++)
+	this->rowList = new LinkedList<T>[this->rows];
+	for (int i = 0; i < this->rows; i++)
 	{
 		rowList[i] = other.rowList[i];
 	}
 }
 
 template<class T>
+SM<T> & SM<T>::operator=(const SM<T>& other)
+{
+	if (this == &other) {
+		return *this;
+	}
+
+	SM<T> temp(other);
+	swap(temp.rows, rows);
+	swap(temp.columns, columns);
+	swap(temp.rowList, rowList);
+	return *this;
+}
+
+template<class T>
 SM<T>::~SM()
 {
 	cout << "Deleting sm" << endl;
-	delete[] rowList;
+	delete [] rowList;
 }
 
 template<class T>
@@ -252,7 +296,6 @@ void SM<T>::readElements()
 template<class T>
 void SM<T>::printMatrix()
 {
-	cout << "SIZE: " << rowList[0].getSize() << endl;
 	for (int i = 0; i < this->rows; i++)
 	{
 		rowList[i].printNodes(columns);
@@ -282,15 +325,20 @@ int main()
 	int rows, columns;
 	cin >> rows;
 	cin >> columns;
+
 	SM<int> sm(rows, columns);
-	//	SM<int> sm2(rows, columns);
+	SM<int> sm2(rows, columns);
+
 	sm.readElements();
-	//	sm2.readElements();
+	sm2.readElements();
+
 	sm.printMatrix();
-	//	sm2.printMatrix();
-	//	SM<int> sm3(sm2);
-	//	sm.addSM(sm3);
-	//	sm.printMatrix();
+	sm2.printMatrix();
+
+	SM<int> copySM(sm2);
+
+	sm.addSM(copySM);
+
+	sm.printMatrix();
 	system("pause");
-	return 0;
 }
