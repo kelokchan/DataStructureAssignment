@@ -61,7 +61,7 @@ public:
 	}
 
 	~LinkedList() {
-//		cout << "Going to delete all " << size << " elements of the list." << endl;
+		//		cout << "Going to delete all " << size << " elements of the list." << endl;
 		NodeType<T> * current = head;
 		while (current != NULL) {
 			current = current->link;
@@ -143,13 +143,13 @@ public:
 		cout << "[";
 		for (int i = 0; i < column; i++)
 		{		//list not empty
-				if (current != NULL && current->index == i) {	//list index == iteration
-					cout << right << setw(7) << current->info;	//prints out the info
-					current = current->link;		//traverse to next
-				}
-				else {
-					cout << right << setw(7) << "0";
-				}
+			if (current != NULL && current->index == i) {	//list index == iteration
+				cout << right << setw(7) << current->info;	//prints out the info
+				current = current->link;		//traverse to next
+			}
+			else {
+				cout << right << setw(7) << "0";
+			}
 		}
 		cout << setw(7) << "]";
 		cout << endl;
@@ -198,7 +198,7 @@ public:
 		other = list2.head;
 		while (other != NULL)
 		{
-			if (other->info != NULL){
+			if (other->info != NULL) {
 				this->setValue(other->info, other->index);
 			}
 			other = other->link;
@@ -262,7 +262,7 @@ template<class T>
 SM<T>::~SM()
 {
 	cout << "Deleting sm" << endl;
-	delete [] rowList;
+	delete[] rowList;
 }
 
 template<class T>
