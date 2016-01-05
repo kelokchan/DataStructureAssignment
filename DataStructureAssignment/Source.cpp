@@ -123,6 +123,15 @@ public:
 		}
 	}
 
+	void insertValue(T value, int inputIndex, NodeType<T> * &prev) {
+		NodeType<T> * newNode = new NodeType<T>;
+		newNode->info = value;
+		newNode->index = inputIndex;
+		newNode->link = prev->link;
+		prev->link = newNode;
+		size++;
+	}
+
 	T getValue(int column) {
 		NodeType<T>* current = head;
 		while (current != NULL) {
@@ -161,9 +170,9 @@ public:
 		newNode->index = index;
 		newNode->link = head;
 		head = newNode;
-		size++;
 		if (tail == NULL)
 			tail = newNode;
+		size++;
 	}
 
 	void insertAtEnd(T value, int index) {
@@ -180,29 +189,53 @@ public:
 		size++;
 	}
 
-	void sumNodes(LinkedList<T> &list2) {
+	void sPrint() {
 		NodeType<T> * current = head;
-		NodeType<T> * other;
 		while (current != NULL) {
-			other = list2.head;
-			while (other != NULL) {
-				if (current->index == other->index) {
-					current->info += other->info;
-					other->info = NULL;
-				}
-				other = other->link;
-			}
+			cout << " " << current->info << " ";
 			current = current->link;
 		}
+	}
 
-		other = list2.head;
-		while (other != NULL)
-		{
-			if (other->info != NULL) {
-				this->setValue(other->info, other->index);
+	void sumNodes(LinkedList<T> &list2) {
+		NodeType<T> * current = head;
+		NodeType<T> * other = list2.head;
+		NodeType<T> * prev = NULL;
+		while (other != NULL) {
+			if (current != NULL) {
+				if (current->index > other->index) {							//other index < current index, insert other until other >= current index
+					this->setValue(other->info, other->index);
+					other = other->link;
+				}
+				else {
+					while (current->index < other->index) {						//traverse until current index >= other index, current info remains
+						prev = current;
+						if (current->link != NULL) {
+							current = current->link;
+						}
+						else {
+							break;
+						}
+					}
+					if (current->index == other->index) {
+						current->info += other->info;
+						prev = current;
+						current = current->link;
+						other = other->link;
+					}
+					else {												//current > other
+						this->insertValue(other->info, other->index, prev);
+						//this->(other->info, other->index);
+						other = other->link;
+					}
+				}
 			}
-			other = other->link;
+			else {
+				this->insertAtEnd(other->info, other->index);
+				other = other->link;
+			}
 		}
+		cout << "SIZE: " << size << endl;
 	}
 };
 
@@ -341,4 +374,5 @@ int main()
 
 	sm.printMatrix();
 	system("pause");
+	return 0;
 }
