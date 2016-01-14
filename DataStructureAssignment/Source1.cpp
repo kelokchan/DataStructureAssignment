@@ -2,30 +2,29 @@
 using namespace std;
 
 template <class T>
-class DoublyNodeType {
+class NodeType {
 public:
 	T info;
 	T index;
-	DoublyNodeType<T> * next;
-	DoublyNodeType<T> * prev;
+	NodeType<T> * next;
 };
 
 template <class T>
-class DoublyLinkedList {
+class LinkedList {
 public:
-	DoublyNodeType<T> * head;
-	DoublyNodeType<T> * tail;
+	NodeType<T> * head;
+	NodeType<T> * tail;
 	int size;
 
-	DoublyLinkedList() {
+	LinkedList() {
 		this->size = 0;
 		this->head = NULL;
 		this->tail = NULL;
 	}
 
-	~DoublyLinkedList() {
+	~LinkedList() {
 		cout << "Going to delete all " << size << " elements of the list." << endl;
-		DoublyNodeType<T> * current = head;
+		NodeType<T> * current = head;
 		while (current != NULL) {
 			current = current->next;
 			delete head;
@@ -33,9 +32,45 @@ public:
 		}
 	}
 
+	void insertAtBeginning(T col, T value) {
+		NodeType<T> * newNode = new NodeType<T>;
+		newNode->info = value;
+		newNode->index = col;
+		newNode->next = head;
+		head = newNode;
+		size++;
+		if (tail == NULL)
+			tail = newNode;
+
+	}
+
+	void insertAtEnd(T col, T value) {
+		NodeType<T> * newNode = new NodeType<T>;
+		newNode->info = value;
+		newNode->index = col;
+		newNode->next = NULL;
+		if (head == NULL)//inserting to an empty list
+			head = tail = newNode;
+		else {
+			tail->next = newNode;
+			tail = newNode;
+		}
+		size++;
+	}
+
+	void insertAt(T col, T value, NodeType <T> * &current, NodeType <T> * &prev) {
+		NodeType<T> * newNode = new NodeType<T>;
+		newNode->info = value;
+		newNode->index = col;
+		newNode->next = current;
+		prev = newNode;
+
+		size++;
+	}
+
 	void insertValue(T col, T value) {
 		//IF the list is empthy or the first node is bigger than newNode, insert at the beginning 
-		if (head == NULL || head->index>col)
+		if (head == NULL || head->index > col)
 		{
 			this->insertAtBeginning(col, value);
 		}
@@ -44,12 +79,15 @@ public:
 			this->insertAtEnd(col, value);
 		}
 		//ELSE do searching in existing nodes list in order to find the node which is bigger than or equal with newNode.
-		//BIGGER THAN : point to the bigger one and insert the newNode before it.
-		//EQUAL WITH : replace the value of node.
+		//BIGGER THAN : Insert the newNode before it.
+		//EQUAL WITH : Replace the value of node.
 		else
 		{
-			DoublyNodeType<T> * current = head;
+			NodeType<T> * current = head;
+			NodeType<T> * prev = head;
+
 			while (current->index < col) {
+				prev = current;
 				current = current->next;
 			}
 			if (current->index == col)
@@ -58,49 +96,13 @@ public:
 			}
 			else
 			{
-				DoublyNodeType<T> * newNode = new DoublyNodeType<T>;
-				newNode->info = value;
-				newNode->index = col;
-				newNode->next = current;
-				newNode->prev = current->prev;
-				current->prev->next = newNode;
-				current->prev = newNode;
-				size++;
+				this->insertAt(col, value, current, prev);
 			}
 		}
 	}
 
-	void insertAtBeginning(T col, T value) {
-		DoublyNodeType<T> * newNode = new DoublyNodeType<T>;
-		newNode->info = value;
-		newNode->index = col;
-		newNode->next = head;
-		newNode->prev = NULL;
-		head = newNode;
-		if (tail == NULL)//inserting to an empty list
-			tail = newNode;
-		else
-			newNode->next->prev = newNode;
-		size++;
-	}
-
-	void insertAtEnd(T col, T value) {
-		DoublyNodeType<T> * newNode = new DoublyNodeType<T>;
-		newNode->info = value;
-		newNode->index = col;
-		newNode->next = NULL;
-		newNode->prev = tail;
-		tail = newNode;
-		if (head == NULL)//inserting to an empty list
-			head = newNode;
-		else
-			newNode->prev->next = newNode;
-		size++;
-
-	}
-
 	void printValue(T column) {
-		DoublyNodeType<T>* current = head;
+		NodeType<T>* current = head;
 		for (int colIndex = 0; colIndex < column; colIndex++)
 		{
 			int value = 0;
@@ -135,43 +137,46 @@ public:
 		}
 	}
 
-	void addValue(DoublyLinkedList<int> & list) {
+	void addValue(LinkedList<int> & list2) {
 
-		DoublyNodeType<T> * listA = head;
-		DoublyNodeType<T> * listB = list.head;
-		while (listB != NULL) {
-			if (listA != NULL) {
+		NodeType<T> * listA = head;
+		NodeType<T> * listB = list2.head;
+
+		//Loop until the listB empty 
+		while (listB != NULL)
+		{
+			if (head == NULL)
+			{
+				this->insertAtEnd(listB->index, listB->info);
+				listB = listB->next;
+			}
+			else if (head->index > listB->index)
+			{
+				this->insertAtBeginning(listB->index, listB->info);
+				listB = listB->next;
+			}
+			else if (tail->index< listB->index)
+			{
+				this->insertAtEnd(listB->index, listB->info);
+				listB = listB->next;
+			}
+			else {
+
+				NodeType<T>* listAPrev;
 
 				while (listA->index < listB->index) {
+					listAPrev = listA;
 					listA = listA->next;
 				}
 				if (listA->index == listB->index) {
 					listA->info = listA->info + listB->info;
-
 					listA = listA->next;
-					listB = listB->next;
 				}
 				else {
-					DoublyNodeType<T> * newNode = new DoublyNodeType<T>;
-					newNode->info = listB->info;
-					newNode->index = listB->index;
-
-					newNode->next = listA;
-					newNode->prev = listA->prev;
-					listA->prev->next = newNode;
-					listA->prev = newNode;
-					size++;
-
-					listB = listB->next;
+					this->insertAt(listB->index, listB->info, listA, listAPrev);
 				}
-
-			}
-			else {
-				this->insertAtEnd(listB->index, listB->info);
 				listB = listB->next;
 			}
-
-
 		}
 
 	}
@@ -180,7 +185,7 @@ public:
 class SM {
 public:
 	int n; int m; // # rows, # columns
-	DoublyLinkedList<int>* list;
+	LinkedList<int>* list;
 
 	SM(int rows, int columns);
 	~SM();
@@ -193,11 +198,10 @@ public:
 SM::SM(int rows, int columns) {
 	this->n = rows;
 	this->m = columns;
-	this->list = new DoublyLinkedList<int>[rows];
+	this->list = new LinkedList<int>[rows];
 };
 
 SM::~SM() {
-
 	delete[] list;
 };
 
@@ -242,7 +246,7 @@ void SM::addSM(SM & other) {
 
 };
 
-void main2() {
+void main() {
 	int rows, columns;
 	cout << "Sparse Matrix's Row : ";
 	cin >> rows;
