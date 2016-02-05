@@ -19,7 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Graph.cpp" />
+    <ClCompile Include="SM.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{43935A2E-4C39-4C3E-B5A8-02CACFF04097}</ProjectGuid>
